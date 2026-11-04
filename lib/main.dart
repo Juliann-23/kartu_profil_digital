@@ -6,6 +6,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final prefs = await PrefService.init();
+
   await prefs.increaseOpenCount();
 
   runApp(MyApp(prefs: prefs));

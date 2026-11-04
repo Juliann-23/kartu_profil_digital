@@ -25,21 +25,41 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _profile = widget.prefs.profile; // baca data tersimpan
+    _profile = widget.prefs.profile;
   }
 
   Future<void> _edit() async {
     final result = await Navigator.push<ProfileData>(
       context,
-      MaterialPageRoute(builder: (_) => EditProfilePage(initial: _profile)),
+      MaterialPageRoute(
+        builder: (_) => EditProfilePage(initial: _profile),
+      ),
     );
-    if (result == null) return; // pengguna menekan back
+
+    if (result == null) return;
 
     await widget.prefs.saveProfile(result);
+
     if (!mounted) return;
+
     setState(() => _profile = result);
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Profil tersimpan')),
+    );
+  }
+
+  Future<void> _reset() async {
+    await widget.prefs.clearProfile();
+
+    if (!mounted) return;
+
+    setState(() => _profile = widget.prefs.profile);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Profil dikembalikan ke bawaan'),
+      ),
     );
   }
 
@@ -71,15 +91,23 @@ class _ProfilePageState extends State<ProfilePage> {
                   CircleAvatar(
                     radius: 40,
                     backgroundColor: colors.primaryContainer,
-                    child: Text(initial, style: const TextStyle(fontSize: 32)),
+                    child: Text(
+                      initial,
+                      style: const TextStyle(fontSize: 32),
+                    ),
                   ),
                   const SizedBox(height: 16),
-                  Text(_profile.name,
-                      style: Theme.of(context).textTheme.headlineSmall),
+                  Text(
+                    _profile.name,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                   const SizedBox(height: 4),
                   Text(_profile.title),
                   const SizedBox(height: 12),
-                  Text(_profile.bio, textAlign: TextAlign.center),
+                  Text(
+                    _profile.bio,
+                    textAlign: TextAlign.center,
+                  ),
                 ],
               ),
             ),
@@ -90,6 +118,12 @@ class _ProfilePageState extends State<ProfilePage> {
             title: const Text('Mode Gelap'),
             value: widget.isDark,
             onChanged: widget.onThemeChanged,
+          ),
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            onPressed: _reset,
+            icon: const Icon(Icons.restore),
+            label: const Text('Reset Profil'),
           ),
           // Lab 11 akan menambahkan menu "Proyek Saya" di sini.
           const SizedBox(height: 24),
